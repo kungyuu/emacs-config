@@ -1,0 +1,20 @@
+# Emacs 自动生成文件
+*~
+*.elc
+*.el~
+\#*\#
+.\#*
+
+# 包管理目录
+/elpa/
+package-quickstart.el
+package-selected.el
+
+# 自动生成的文件
+recentf
+auto-save-list/
+session.*
+
+# 系统文件
+Thumbs.db
+.DS_Store
