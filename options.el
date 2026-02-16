@@ -51,41 +51,29 @@
 ;; Markdown 代码块强制修复
 ;; ========================================
 (defun my-force-markdown-faces ()
-  "Markdown 样式：针对 Adwaita 浅色主题优化"
+  "仅 Markdown 模式：Adwaita 浅色主题优化，不影响其他模式"
   (when (derived-mode-p 'markdown-mode)
     (setq-local line-spacing 0)
     
     ;; Adwaita 浅色主题配色
-    (let ((bg-color "#ffffff")      ;; 纯白背景
-          (fg-color "#2e3436")      ;; 深灰文字
-          (code-bg "#f6f8fa")       ;; 浅灰代码块背景
-          (inline-code-bg "#f0f0f0")) ;; 行内代码背景
+    (let ((code-bg "#f6f8fa")       ;; 浅灰代码块背景
+          (inline-code-bg "#f0f0f0") ;; 行内代码背景
+          (fg-color "#2e3436"))      ;; 深灰文字
       
-      ;; 重置所有相关 face
-      (dolist (face '(markdown-pre-face
-                      markdown-code-face
-                      markdown-inline-code-face
-                      markdown-link-face
-                      markdown-url-face))
-        (face-remap-reset-base face))
-      
-      ;; 代码块
+      ;; 只在当前 buffer 生效（不会全局改）
       (face-remap-add-relative 'markdown-pre-face
                                `(:background ,code-bg :foreground ,fg-color :extend t))
       (face-remap-add-relative 'markdown-code-face
                                `(:background ,code-bg :foreground ,fg-color :extend t))
-      
-      ;; 行内代码
       (face-remap-add-relative 'markdown-inline-code-face
                                `(:background ,inline-code-bg 
                                             :foreground ,fg-color 
                                             :extend nil))
-      
-      ;; 链接 - 让它和普通文字一样
+      ;; 链接继承普通文字
       (face-remap-add-relative 'markdown-link-face 'default)
       (face-remap-add-relative 'markdown-url-face 'default)
       
-      (message "Markdown faces updated for Adwaita theme"))))
+      (message "Markdown faces applied (Adwaita)"))))
 
 ;; 进入 Markdown 时应用
 (add-hook 'markdown-mode-hook #'my-force-markdown-faces)
