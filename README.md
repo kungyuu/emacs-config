@@ -9,6 +9,5 @@
 ├─early-init.el  
 ├─init.el  
 ├─options.el  
-├─plugins.el  
-└─site-lisp  
+└─plugins.el  
 ```
