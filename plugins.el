@@ -95,18 +95,25 @@
 ;; 安装 Dracula Theme - 默认启用
 (use-package dracula-theme
   :ensure t
-  :demand t                                   ;; 立即加载，因为我们要默认启用
-  :config
-  (load-theme 'dracula t))                    ;; 加载 Dracula 主题
+  ;; :demand t                                   ;; 立即加载
+  :defer t                                     ;; 延迟加载
+  ;; :config
+  ;; (load-theme 'dracula t)
+  )
 
 ;; 其他主题配置优化：
 ;; 1. 使用 :defer t 延迟加载，只在需要时加载
 ;; 2. 添加 :custom 设置主题选项
 ;; 3. 统一使用 autoload 而非立即加载
 
+(use-package poet-theme
+  :ensure t
+  :config
+  (load-theme 'poet t))
+
 (use-package doom-themes
   :ensure t
-  :defer t                                     ;; 延迟加载，仅在切换主题时加载
+  :defer t
   ;; :custom
   ;; (doom-themes-enable-bold t)                  ;; 启用粗体
   ;; (doom-themes-enable-italic t)                ;; 启用斜体
@@ -172,14 +179,29 @@
 ;;   (flycheck-check-syntax-automatically '(save idle-change))
 ;;   (flycheck-idle-change-delay 1.0))
 
+;; ========== Markdown + preview ==========================
+;; preview 使用本地浏览器 + 专业浏览器插件 markdown preview
 (use-package markdown-mode
   :ensure t
   :mode (("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :config
-  (setq markdown-fontify-code-blocks-natively t))
+  (setq markdown-fontify-code-blocks-natively t)
+  
+  ;; 🔥 新命令：直接用 Edge 打开当前文件
+  (defun my-markdown-open-in-edge ()
+    "在 Edge 中打开当前 Markdown 文件"
+    (interactive)
+    (let ((file (buffer-file-name)))
+      (if file
+          ;; (browse-url-file file)  ;; 用系统默认浏览器打开
+          (shell-command (format "start msedge \"%s\"" file)) ;; 使用 ms-edge 打开
+        (message "当前缓冲区没有关联的文件"))))
+  
+  :bind (:map markdown-mode-map
+         ("C-c C-c p" . my-markdown-open-in-edge)))  ;; 覆盖原来的预览
 
-;;; ========== 语义补全最佳实践 (EGLOT + CORFU + ORDERLESS) ==========
+;;; ========== 语义补全 (EGLOT + CORFU + ORDERLESS) ==========
 
 ;; 确保安装所需插件 (M-x package-install 安装 corfu, orderless)
 ;; eglot 是 Emacs 29+ 内置的，无需手动安装
@@ -192,7 +214,7 @@
   (corfu-auto-delay 0.2)         ;; 输入后延迟0.2秒弹出
   (corfu-auto-prefix 1)          ;; 输入1个字符即触发
   (corfu-cycle t)                ;; 允许在列表末尾循环
-  (corfu-preselect 'prompt)      ;; 预选第一项，但不会自动插入
+  (corfu-preselect 'always)      ;; 预选第一项，但不会自动插入
   (corfu-quit-at-boundary nil)   ;; 不要在边界自动退出
   (corfu-quit-no-match nil)      ;; 不要因为没有匹配项就退出
   (corfu-preview-current nil)    ;; 关闭预览，避免干扰
@@ -221,7 +243,8 @@
          (typescript-mode . eglot-ensure)
          (c-mode . eglot-ensure)
          (c++-mode . eglot-ensure)
-         ;; 其他语言...
+         (sh-mode . eglot-ensure)
+         (bash-ts-mode . eglot-ensure)
          )
   :config
   ;; 告诉 Eglot 使用 Corfu 作为补全前端
@@ -240,7 +263,8 @@
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)      ;; 从缓冲区补全
   (add-to-list 'completion-at-point-functions #'cape-file)         ;; 文件名补全
   (add-to-list 'completion-at-point-functions #'cape-elisp-block)  ;; 在注释里补全elisp
-  ;; (add-to-list 'completion-at-point-functions #'cape-keyword)   ;; 关键字补全
+  ;; (add-to-list 'completion-at-point-functions #'cape-keyword)      ;; 关键字补全
+  (add-to-list 'completion-at-point-functions #'cape-elisp-symbol) ;; Elisp 符号补全
   )
 
 ;;; ==================== 提供包 ====================

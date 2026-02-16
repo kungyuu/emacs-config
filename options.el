@@ -1,13 +1,102 @@
 ;;; options.el --- Basic options  -*- lexical-binding: t; -*-
 
 ;; ========================================
-;; 设置 Emoji 字体, 解决 Emoji 显示问题
+;; 编码设置（必须放在最前面）
+;; ========================================
+(set-default-coding-systems 'utf-8)
+(set-language-environment 'utf-8)
+(setq default-buffer-file-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+
+;; ========================================
+;; 字体设置
 ;; ========================================
 (when (eq system-type 'windows-nt)
-      (set-fontset-font t 'unicode
-        (font-spec :family "Segoe UI Emoji")
-            nil
-            'after))
+  ;; 默认字体
+  (set-face-attribute 'default nil
+                      :family "Sarasa Term SC Nerd"
+                      :height 110)
+  
+  ;; 固定宽度字体
+  (set-face-attribute 'fixed-pitch nil
+                      :family "Sarasa Term SC Nerd"
+                      :height 1.0)
+  
+  ;; 可变宽度字体
+  (set-face-attribute 'variable-pitch nil
+                      :family "Microsoft Yahei"
+                      :height 1.2
+                      :weight 'normal)
+  
+  ;; 🔥 修复 tab-bar 字体过大
+  (set-face-attribute 'tab-bar nil
+                      :family (face-attribute 'default :family)
+                      :height (face-attribute 'default :height))
+  (set-face-attribute 'tab-bar-tab nil
+                      :family (face-attribute 'default :family)
+                      :height (face-attribute 'default :height))
+  (set-face-attribute 'tab-bar-tab-inactive nil
+                      :family (face-attribute 'default :family)
+                      :height (face-attribute 'default :height))
+  
+  ;; Emoji 字体
+  (set-fontset-font t 'unicode
+                    (font-spec :family "Segoe UI Emoji")
+                    nil 'after))
+
+;; ========================================
+;; Markdown 代码块强制修复
+;; ========================================
+(defun my-force-markdown-faces ()
+  "Markdown 样式：针对 Adwaita 浅色主题优化"
+  (when (derived-mode-p 'markdown-mode)
+    (setq-local line-spacing 0)
+    
+    ;; Adwaita 浅色主题配色
+    (let ((bg-color "#ffffff")      ;; 纯白背景
+          (fg-color "#2e3436")      ;; 深灰文字
+          (code-bg "#f6f8fa")       ;; 浅灰代码块背景
+          (inline-code-bg "#f0f0f0")) ;; 行内代码背景
+      
+      ;; 重置所有相关 face
+      (dolist (face '(markdown-pre-face
+                      markdown-code-face
+                      markdown-inline-code-face
+                      markdown-link-face
+                      markdown-url-face))
+        (face-remap-reset-base face))
+      
+      ;; 代码块
+      (face-remap-add-relative 'markdown-pre-face
+                               `(:background ,code-bg :foreground ,fg-color :extend t))
+      (face-remap-add-relative 'markdown-code-face
+                               `(:background ,code-bg :foreground ,fg-color :extend t))
+      
+      ;; 行内代码
+      (face-remap-add-relative 'markdown-inline-code-face
+                               `(:background ,inline-code-bg 
+                                            :foreground ,fg-color 
+                                            :extend nil))
+      
+      ;; 链接 - 让它和普通文字一样
+      (face-remap-add-relative 'markdown-link-face 'default)
+      (face-remap-add-relative 'markdown-url-face 'default)
+      
+      (message "Markdown faces updated for Adwaita theme"))))
+
+;; 进入 Markdown 时应用
+(add-hook 'markdown-mode-hook #'my-force-markdown-faces)
+
+;; 切换主题时重新应用
+(add-hook 'after-load-theme-hook
+          (lambda ()
+            (dolist (buf (buffer-list))
+              (with-current-buffer buf
+                (when (derived-mode-p 'markdown-mode)
+                  (my-force-markdown-faces))))))
 
 ;;; 基础界面设置
 ;; (menu-bar-mode -1)                    ;; 关闭菜单栏，节省屏幕空间
@@ -332,6 +421,35 @@ DIRECTION 为 1 时切换到下一个主题，为 -1 时切换到上一个主题
 
 ;;; 确保退出时清理定时器 - 避免Emacs退出后残留定时器
 (add-hook 'kill-emacs-hook #'my-stop-region-timer)         ;; Emacs退出时停止定时器
+
+(setq whitespace-display-mappings
+      '((space-mark ?\  [?·] [?.])      ;; 空格显示为 ·
+        (newline-mark ?\n [?$ ?\n])      ;; 换行显示为 $
+        (tab-mark ?\t [?» ?\t])))        ;; Tab 显示为 »
+
+;; ========================================
+;; 强制修复标题栏字体大小
+;; ========================================
+(defun my-fix-tab-bar-font ()
+  "强制 tab-bar 字体与默认字体一致"
+  (let ((default-height (face-attribute 'default :height))
+        (default-family (face-attribute 'default :family)))
+    (set-face-attribute 'tab-bar nil
+                        :family default-family
+                        :height default-height)
+    (set-face-attribute 'tab-bar-tab nil
+                        :family default-family
+                        :height default-height)
+    (set-face-attribute 'tab-bar-tab-inactive nil
+                        :family default-family
+                        :height default-height)))
+
+;; 在主题加载后和 Emacs 启动后都执行
+(add-hook 'after-load-theme-hook #'my-fix-tab-bar-font)
+(add-hook 'window-setup-hook #'my-fix-tab-bar-font)  ;; 启动后执行
+
+;; 立即执行一次
+(my-fix-tab-bar-font)
 
 (provide 'options)                                       ;; 提供 options 模块
 ;;; options.el ends here
