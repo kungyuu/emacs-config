@@ -1,4 +1,4 @@
-;;; my_plugins.el --- Plugins -*- coding: utf-8; lexical-binding: t; -*-
+;;; plugins.el --- Plugins -*- coding: utf-8; lexical-binding: t; -*-
 
 ;;; ==================== 包管理器初始化 ====================
 (require 'package)
@@ -7,7 +7,6 @@
 (setq package-enable-at-startup nil)
 
 ;; 配置包仓库 - 按地区选择最快的镜像源
-;; 国内用户可取消注释下面的镜像源以获得更快速度
 (setq package-archives
       '(;; 官方源 - 速度较慢但最稳定
         ("gnu"   . "https://elpa.gnu.org/packages/")
@@ -25,7 +24,7 @@
         ;; ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
         ;; ("nongnu". "https://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
         )
-      
+
       ;; 仓库优先级设置 - 确保稳定优先
       package-archive-priorities
       '(("gnu"    . 10)   ;; GNU ELPA 优先级最高，最稳定
@@ -65,6 +64,7 @@
   (editorconfig-mode 1)
   )
 
+;; 解决内部依赖问题 - 例如 editorconfig 内置但需要启用
 (use-package dash
   :ensure t
   )
@@ -114,38 +114,6 @@
   ;; (load-theme 'doom-zenburn t)              ;; 默认不加载，需要时通过切换主题加载
   )
 
-;; (use-package monokai-pro-theme
-;;   :ensure t
-;;   :defer t                                     ;; 延迟加载
-;;   )
-
-;; (use-package solarized-theme
-;;   :ensure t
-;;   :defer t                                     ;; 延迟加载
-;;   :custom
-;;   (solarized-distinct-fringe-background nil)   ;; 配置示例
-;;   )
-
-;; (use-package material-theme
-;;   :ensure t
-;;   :defer t                                     ;; 延迟加载
-;;   )
-
-;; (use-package nord-theme
-;;   :ensure t
-;;   :defer t                                     ;; 延迟加载
-;;   )
-
-;; (use-package gruber-darker-theme
-;;   :ensure t
-;;   :defer t                                     ;; 延迟加载
-;;   )
-
-;; (use-package zenburn-theme
-;;   :ensure t
-;;   :defer t                                     ;; 延迟加载
-;;   )
-
 ;;; ==================== 增强功能 ====================
 
 ;; which-key - 显示可用的快捷键
@@ -185,7 +153,7 @@
 
 ;;; ==================== 可选功能 ====================
 
-;; 如果需要公司补全，可以取消注释
+;; company - 代码补全
 ;; (use-package company
 ;;   :ensure t
 ;;   :demand t
@@ -203,11 +171,6 @@
 ;;   :custom
 ;;   (flycheck-check-syntax-automatically '(save idle-change))
 ;;   (flycheck-idle-change-delay 1.0))
-
-;; (use-package editorconfig
-;;   :ensure t  ;; 强制从 melpa 安装，不管是否内置
-;;   :config
-;;   (editorconfig-mode 1) (message "✅ editorconfig 已启用"))
 
 (use-package markdown-mode
   :ensure t
@@ -281,5 +244,5 @@
   )
 
 ;;; ==================== 提供包 ====================
-(provide 'my_plugins)
-;;; my_plugins.el ends here
+(provide 'plugins)
+;;; plugins.el ends here

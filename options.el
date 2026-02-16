@@ -1,4 +1,4 @@
-;;; my_options.el --- Basic options  -*- lexical-binding: t; -*-
+;;; options.el --- Basic options  -*- lexical-binding: t; -*-
 
 ;; ========================================
 ;; 设置 Emoji 字体, 解决 Emoji 显示问题
@@ -333,5 +333,5 @@ DIRECTION 为 1 时切换到下一个主题，为 -1 时切换到上一个主题
 ;;; 确保退出时清理定时器 - 避免Emacs退出后残留定时器
 (add-hook 'kill-emacs-hook #'my-stop-region-timer)         ;; Emacs退出时停止定时器
 
-(provide 'my_options)                                       ;; 提供 my_options 模块
-;;; my_options.el ends here
+(provide 'options)                                       ;; 提供 options 模块
+;;; options.el ends here
